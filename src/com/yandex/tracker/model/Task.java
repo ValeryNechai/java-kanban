@@ -1,14 +1,27 @@
+package com.yandex.tracker.model;
+
+import com.yandex.tracker.service.TaskStatus;
+
 import java.util.Objects;
 
 public class Task {
     private String name;
     private String description;
     private TaskStatus status;
+    private int idNumber;
 
     public Task(String name, String description, TaskStatus status) {
         this.name = name;
         this.description = description;
         this.status = status;
+    }
+
+    public int getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(int idNumber) {
+        this.idNumber = idNumber;
     }
 
     public String getName() {
@@ -49,7 +62,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "com.yandex.tracker.model.Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +

@@ -1,23 +1,23 @@
+package com.yandex.tracker.model;
+
+import com.yandex.tracker.service.TaskStatus;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> idSubtasks = new ArrayList<>();
 
-    public Epic(String name, String description, TaskStatus status) {
-        super(name, description, status);
+    public Epic(String name, String description) {
+        super(name, description, TaskStatus.NEW);
     }
 
     public ArrayList<Integer> getIdSubtasks() {
         return idSubtasks;
     }
 
-    public void setIdSubtasks(ArrayList<Integer> idSubtasks) {
-        this.idSubtasks = idSubtasks;
-    }
-
     @Override
     public String toString() {
-        return "Epic{" + super.toString() +
+        return "com.yandex.tracker.model.Epic{" + super.toString() +
                 "subtask=" + idSubtasks +
                 '}';
     }
