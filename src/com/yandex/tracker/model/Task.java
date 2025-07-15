@@ -8,7 +8,7 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus status;
-    private int idNumber;
+    private int id;
 
     public Task(String name, String description, TaskStatus status) {
         this.name = name;
@@ -16,12 +16,12 @@ public class Task {
         this.status = status;
     }
 
-    public int getIdNumber() {
-        return idNumber;
+    public int getId() {
+        return id;
     }
 
-    public void setIdNumber(int idNumber) {
-        this.idNumber = idNumber;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
