@@ -3,10 +3,7 @@ package com.yandex.tracker;
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.model.Task;
-import com.yandex.tracker.service.InMemoryTaskManager;
-import com.yandex.tracker.service.Managers;
-import com.yandex.tracker.service.TaskManager;
-import com.yandex.tracker.service.TaskStatus;
+import com.yandex.tracker.service.*;
 
 public class Main {
 
@@ -66,6 +63,8 @@ public class Main {
         System.out.println("____________________________");
 
         printAllTasks(taskManager);
+        System.out.println("____________________________");
+
 
 
         //Удаление по ID
@@ -90,7 +89,6 @@ public class Main {
         System.out.println(taskManager.getAllEpics());
         System.out.println("____________________________");
 
-        System.out.println(taskManager.getHistory());
         printAllTasks(taskManager);
     }
 
@@ -100,10 +98,10 @@ public class Main {
             System.out.println(task);
         }
         System.out.println("Эпики:");
-        for (Epic epic : manager.getAllEpics()) {
+        for (Task epic : manager.getAllEpics()) {
             System.out.println(epic);
 
-            for (Subtask subtaskForEpic : manager.getAllSubtasksForEpic(epic)) {
+            for (Task subtaskForEpic : manager.getAllSubtasksForEpic((Epic) epic)) {
                 System.out.println("--> " + subtaskForEpic);
             }
         }
