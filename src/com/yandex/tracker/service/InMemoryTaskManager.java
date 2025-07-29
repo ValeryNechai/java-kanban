@@ -33,7 +33,22 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addNewSubtask(Subtask subtask) {
         int id = IDGenerator.getID();
+
+        if (subtask == null) {
+            throw new IllegalArgumentException("Подзадача не может быть null.");
+        }
+
+        Epic epic = epics.get(subtask.getEpicID());
+
+        if (epic == null) {
+            throw new IllegalArgumentException("Эпик не найден.");
+        }
+
         subtask.setId(id);
+        if (subtask.getId() == epic.getId()) {
+            throw new IllegalArgumentException("Нельзя добавить подзадачу в саму себя.");
+        }
+
         subtasks.put(id, subtask);
         Epic epicForSubtask = epics.get(subtask.getEpicID());
         ArrayList<Integer> subtaskForEpic = epicForSubtask.getIdSubtasks();
@@ -104,6 +119,7 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(epic.getId(), epic);
     }
 
+    @Override
     public void updateEpicStatus(Integer id) {
         Epic epic = epics.get(id);
         if (epic != null) {

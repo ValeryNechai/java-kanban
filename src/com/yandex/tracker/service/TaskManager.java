@@ -31,6 +31,8 @@ public interface TaskManager {
 
     void updateEpic(Epic epic);
 
+    void updateEpicStatus(Integer id);
+
     ArrayList<Subtask> getAllSubtasksForEpic(Epic epic);
 
     void removeTask(Integer id);

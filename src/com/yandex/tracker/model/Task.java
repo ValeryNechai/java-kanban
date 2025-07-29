@@ -16,6 +16,15 @@ public class Task {
         this.status = status;
     }
 
+    public Task (Task task) {
+        if (task == null) {
+            throw new IllegalArgumentException("Task не может быть null");
+        }
+        this.name = task.name;
+        this.description = task.description;
+        this.status = task.status;
+    }
+
     public int getId() {
         return id;
     }

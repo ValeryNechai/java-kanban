@@ -1,7 +1,5 @@
 package com.yandex.tracker.service;
 
-import java.util.ArrayList;
-
 public final class Managers {
 
     public static TaskManager getDefault() {
