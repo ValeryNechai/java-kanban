@@ -2,26 +2,28 @@ package com.yandex.tracker.service;
 
 import com.yandex.tracker.model.Task;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    public static final int MAX_SIZE = 10;
+    private static final int MAX_SIZE = 10;
 
-    private final ArrayList<Task> history = new ArrayList<>(MAX_SIZE);
+    private final LinkedList<Task> history = new LinkedList<>();
 
 
     @Override
     public void add(Task task) {
-        if (history.size() < MAX_SIZE) {
+        if (task != null) {
             history.add(new Task(task));
-        } else {
-            history.remove(0);
-            history.add(task);
+        /* делаю копию задачи для того, чтобы в случае изменения каких-то аргументов задачи, в истории сохранялись
+        предыдущие версии задачи (версия в момент просмотра) */
+        }
+        if (history.size() >= MAX_SIZE) {
+            history.removeFirst();
         }
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        return history;
+    public LinkedList<Task> getHistory() {
+        return new LinkedList<>(history);
     }
 }
