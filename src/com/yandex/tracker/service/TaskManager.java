@@ -48,5 +48,5 @@ public interface TaskManager {
 
     void removeAllEpics();
 
-    LinkedList<Task> getHistory();
+    ArrayList<Task> getHistory();
 }

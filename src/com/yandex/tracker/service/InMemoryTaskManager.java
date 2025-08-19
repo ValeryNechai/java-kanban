@@ -170,11 +170,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTask(Integer id) {
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
     public void removeAllTasks() {
         tasks.clear();
+        for (Task task : tasks.values()) {
+            int id = task.getId();
+            historyManager.remove(id);
+        }
     }
 
     @Override
@@ -186,6 +191,7 @@ public class InMemoryTaskManager implements TaskManager {
             idSubtasks.remove(id);
             updateEpicStatus(removedValue.getEpicID());
         }
+        historyManager.remove(id);
     }
 
     @Override
@@ -196,6 +202,10 @@ public class InMemoryTaskManager implements TaskManager {
             idSubtasks.clear();
             epic.setStatus(TaskStatus.NEW);
         }
+        for (Subtask subtask : subtasks.values()) {
+            int id = subtask.getId();
+            historyManager.remove(id);
+        }
     }
 
     @Override
@@ -205,18 +215,24 @@ public class InMemoryTaskManager implements TaskManager {
             ArrayList<Integer> idSubtasksForEpic = removedValue.getIdSubtasks();
             for (Integer idSubtasks : idSubtasksForEpic) {
                 subtasks.remove(idSubtasks);
+                historyManager.remove(idSubtasks);
             }
         }
+        historyManager.remove(id);
     }
 
     @Override
     public void removeAllEpics() {
         epics.clear();
         subtasks.clear();
+        for (Epic epic : epics.values()) {
+            int id = epic.getId();
+            historyManager.remove(id);
+        }
     }
 
     @Override
-    public LinkedList<Task> getHistory() {
+    public ArrayList<Task> getHistory() {
         return historyManager.getHistory();
     }
 }
