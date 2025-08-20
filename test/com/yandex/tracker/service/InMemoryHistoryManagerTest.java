@@ -6,14 +6,14 @@ import com.yandex.tracker.model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
-    public static HistoryManager historyManager;
-    public static LinkedList<Task> history;
+    public static InMemoryHistoryManager historyManager;
+    public static List<Task> history;
 
     @BeforeEach
     public void beforeEach() {
@@ -32,11 +32,10 @@ class InMemoryHistoryManagerTest {
 
         task.setStatus(TaskStatus.IN_PROGRESS);
         historyManager.add(task);
-        history = historyManager.getHistory();
 
-        assertEquals(2, history.size(), "После добавления задачи, история не должна быть пустой.");
-        assertEquals(TaskStatus.NEW, historyManager.getHistory().getFirst().getStatus(),
-                "После обновления статуса задачи, предыдущая версия данных должна сохраняться.");
+        assertEquals(1, history.size(), "После добавления задачи, история не должна быть пустой.");
+        assertEquals(TaskStatus.IN_PROGRESS, historyManager.getHistory().get(0).getStatus(),
+                "После обновления статус задачи должен меняться.");
     }
 
     @Test
@@ -50,10 +49,9 @@ class InMemoryHistoryManagerTest {
 
         epic1.setStatus(TaskStatus.IN_PROGRESS);
         historyManager.add(epic1);
-        history = historyManager.getHistory();
 
-        assertEquals(TaskStatus.NEW, historyManager.getHistory().getFirst().getStatus(),
-                "После обновления статуса задачи, предыдущая версия данных должна сохраняться.");
+        assertEquals(TaskStatus.IN_PROGRESS, historyManager.getHistory().get(0).getStatus(),
+                "После обновления статус задачи должен меняться.");
     }
 
     @Test
@@ -70,9 +68,18 @@ class InMemoryHistoryManagerTest {
 
         subtask1.setStatus(TaskStatus.IN_PROGRESS);
         historyManager.add(subtask1);
-        history = historyManager.getHistory();
 
-        assertEquals(TaskStatus.NEW, historyManager.getHistory().getFirst().getStatus(),
-                "После обновления статуса задачи, предыдущая версия данных должна сохраняться.");
+        assertEquals(TaskStatus.IN_PROGRESS, historyManager.getHistory().get(0).getStatus(),
+                "После обновления статус задачи должен меняться.");
+    }
+
+    @Test
+    public void shouldRemove() {
+        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW);
+        historyManager.add(task);
+        int taskId = task.getId();
+        historyManager.remove(taskId);
+        assertNotNull(historyManager.getTail(), "После удаления единственной задачи, dummyHead все равно остается.");
+        assertNotNull(historyManager.getHead(), "После удаления единственной задачи, dummyTeil все равно остается.");
     }
 }

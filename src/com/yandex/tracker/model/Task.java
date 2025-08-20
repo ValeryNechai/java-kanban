@@ -16,7 +16,7 @@ public class Task {
         this.status = status;
     }
 
-    public Task (Task task) {
+    public Task(Task task) {
         if (task == null) {
             throw new IllegalArgumentException("Task не может быть null");
         }
