@@ -42,7 +42,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         dummyHead.next = dummyTail;
         dummyTail.prev = dummyHead;
     }
-    
+
     private int size = 0;
 
     private void linkLast(Task task) { //добавление задачи в конец списка
