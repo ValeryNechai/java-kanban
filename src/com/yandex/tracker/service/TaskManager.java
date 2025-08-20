@@ -5,6 +5,7 @@ import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.model.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     int addNewTask(Task task);
@@ -47,5 +48,5 @@ public interface TaskManager {
 
     void removeAllEpics();
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 }

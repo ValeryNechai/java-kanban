@@ -2,7 +2,7 @@ package com.yandex.tracker.service;
 
 import com.yandex.tracker.model.Task;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface HistoryManager {
 
@@ -10,5 +10,5 @@ public interface HistoryManager {
 
     void remove(int id);
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 }

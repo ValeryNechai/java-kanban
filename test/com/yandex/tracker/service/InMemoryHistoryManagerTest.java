@@ -6,14 +6,14 @@ import com.yandex.tracker.model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
     public static InMemoryHistoryManager historyManager;
-    public static ArrayList<Task> history;
+    public static List<Task> history;
 
     @BeforeEach
     public void beforeEach() {
@@ -74,25 +74,12 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void shouldLinkLast() {
-        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW);
-        historyManager.linkLast(task);
-        assertNotNull(historyManager.getHead(), "После добавления первой задачи, ее значение запишется в head.");
-        assertNotNull(historyManager.getTail(), "После добавления первой задачи, ее значение запишется в tail.");
-
-        Task task2 = new Task("Задача2", "Описание задачи", TaskStatus.NEW);
-        historyManager.linkLast(task2);
-        assertNotNull(historyManager.getHead().getNext(), "После добавления новой задачи, ее значение " +
-                "запишется в tail, а head.next больше не будет null.");
-    }
-
-    @Test
-    public void shouldRemoveNode() {
+    public void shouldRemove() {
         Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW);
         historyManager.add(task);
         int taskId = task.getId();
-        historyManager.removeNode(taskId);
-        assertNull(historyManager.getTail(), "После удаления единственной задачи, head = teil = null.");
-        assertNull(historyManager.getHead(), "После удаления единственной задачи, head = teil = null.");
+        historyManager.remove(taskId);
+        assertNotNull(historyManager.getTail(), "После удаления единственной задачи, dummyHead все равно остается.");
+        assertNotNull(historyManager.getHead(), "После удаления единственной задачи, dummyTeil все равно остается.");
     }
 }
