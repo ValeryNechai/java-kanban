@@ -9,7 +9,43 @@ public class Main {
 
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
+        //Спринт 6. Реализую пользовательский сценарий
 
+        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
+        Task task12 = new Task("Сходить в магазин", "купить овощи", TaskStatus.NEW);
+        final int taskID11 = taskManager.addNewTask(task11);
+        final int taskID12 = taskManager.addNewTask(task12);
+
+        Epic epic10 = new Epic("Ремонт", "Обновить цвет стен");
+        Epic epic11 = new Epic("Подготовка отчета", "Организовать сбор информации");
+        final int epicID10 = taskManager.addNewEpic(epic10);
+        final int epicID11 = taskManager.addNewEpic(epic11);
+
+        Subtask subtask10 = new Subtask("Купить краску", "Бежевого цвета", TaskStatus.NEW,
+                epicID10);
+        Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.NEW,
+                epicID10);
+        Subtask subtask12 = new Subtask("Покрасить", "Аккуратно", TaskStatus.NEW,
+                epicID10);
+        final int subtaskID10 = taskManager.addNewSubtask(subtask10);
+        final int subtaskID11 = taskManager.addNewSubtask(subtask11);
+        final int subtaskID12 = taskManager.addNewSubtask(subtask12);
+
+        taskManager.getTask(taskID11);
+        taskManager.getEpic(epicID11);
+        taskManager.getEpic(epicID10);
+        taskManager.getSubtask(subtaskID10);
+        taskManager.getSubtask(subtaskID11);
+        System.out.println(taskManager.getHistory());
+        taskManager.getTask(taskID11);
+        System.out.println(taskManager.getHistory());
+        taskManager.removeEpic(epicID11);
+        System.out.println(taskManager.getHistory());
+        taskManager.removeEpic(epicID10);
+        System.out.println(taskManager.getHistory());
+
+
+/*
         //Создание task, subtask, epic
         Task task1 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
         Task task2 = new Task("Сходить в магазин", "купить овощи", TaskStatus.NEW);
@@ -90,6 +126,7 @@ public class Main {
         System.out.println("____________________________");
 
         printAllTasks(taskManager);
+*/
     }
 
     private static void printAllTasks(TaskManager manager) {
@@ -115,5 +152,6 @@ public class Main {
             System.out.println(task);
         }
     }
+
 }
 
