@@ -1,6 +1,7 @@
 package com.yandex.tracker.model;
 
 import com.yandex.tracker.service.TaskStatus;
+import com.yandex.tracker.service.TaskType;
 
 import java.util.Objects;
 
@@ -9,8 +10,16 @@ public class Task {
     private String description;
     private TaskStatus status;
     private int id;
+    private TaskType taskType;
 
     public Task(String name, String description, TaskStatus status) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
+    public Task(int id, String name, String description, TaskStatus status) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
@@ -57,6 +66,10 @@ public class Task {
         this.status = status;
     }
 
+    public TaskType getTaskType() {
+        return TaskType.TASK;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -71,10 +84,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "com.yandex.tracker.model.Task{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return id + ";" + getTaskType() + ";" + name + ";" + status + ";" + description + ";";
     }
 }

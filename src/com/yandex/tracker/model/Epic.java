@@ -1,11 +1,13 @@
 package com.yandex.tracker.model;
 
 import com.yandex.tracker.service.TaskStatus;
+import com.yandex.tracker.service.TaskType;
 
 import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> idSubtasks = new ArrayList<>();
+    private TaskType taskType = TaskType.EPIC;
 
     public Epic(String name, String description) {
         super(name, description, TaskStatus.NEW);
@@ -16,14 +18,22 @@ public class Epic extends Task {
         this.idSubtasks = idSubtasks;
     }
 
+    public Epic(int id, String name, String description, ArrayList<Integer> idSubtasks) {
+        super(id, name, description, TaskStatus.NEW);
+        this.idSubtasks = idSubtasks;
+    }
+
     public ArrayList<Integer> getIdSubtasks() {
         return idSubtasks;
     }
 
     @Override
+    public TaskType getTaskType() {
+        return TaskType.EPIC;
+    }
+
+    @Override
     public String toString() {
-        return "com.yandex.tracker.model.Epic{" + super.toString() +
-                "subtask=" + idSubtasks +
-                '}';
+        return super.toString() + idSubtasks;
     }
 }

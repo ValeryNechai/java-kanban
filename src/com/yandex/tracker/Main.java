@@ -44,6 +44,8 @@ public class Main {
         taskManager.removeEpic(epicID10);
         System.out.println(taskManager.getHistory());
 
+        printAllTasks(taskManager);
+
 
 /*
         //Создание task, subtask, epic
