@@ -23,7 +23,7 @@ public class Main {
 
         Subtask subtask10 = new Subtask("Купить краску", "Бежевого цвета", TaskStatus.NEW,
                 epicID10);
-        Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.NEW,
+        Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.IN_PROGRESS,
                 epicID10);
         Subtask subtask12 = new Subtask("Покрасить", "Аккуратно", TaskStatus.NEW,
                 epicID10);
@@ -43,6 +43,8 @@ public class Main {
         System.out.println(taskManager.getHistory());
         taskManager.removeEpic(epicID10);
         System.out.println(taskManager.getHistory());
+
+        printAllTasks(taskManager);
 
 
 /*
