@@ -244,7 +244,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         super.removeAllEpics();
         save();
     }
-    
+
     @Override
     public List<Task> getHistory() {
         return super.getHistory();
