@@ -22,8 +22,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) throws IOException {
-        String HOME = System.getProperty("user.home");
-        Path testFile = Paths.get(HOME, "file.txt");
+        String home = System.getProperty("user.home");
+        Path testFile = Paths.get(home, "file.txt");
         if (!Files.exists(testFile)) {
             Files.createFile(testFile);
         } else {
@@ -244,6 +244,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         super.removeAllEpics();
         save();
     }
+    
     @Override
     public List<Task> getHistory() {
         return super.getHistory();
