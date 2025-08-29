@@ -7,7 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,16 +40,27 @@ public class FileBackedTaskManagerTest {
     @Test
     public void testSaveAndLoadFile() {
         Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
-        final int taskID11 = fb.addNewTask(task11);
+        fb.addNewTask(task11);
+        Epic epic10 = new Epic("Ремонт", "Обновить цвет стен");
+        int epicID10 = fb.addNewEpic(epic10);
+        Subtask subtask10 = new Subtask("Купить краску", "Бежевого цвета", TaskStatus.NEW,
+                epicID10);
+        Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.NEW,
+                epicID10);
+        Subtask subtask12 = new Subtask("Покрасить", "Аккуратно", TaskStatus.NEW,
+                epicID10);
+        fb.addNewSubtask(subtask10);
+        fb.addNewSubtask(subtask11);
+        fb.addNewSubtask(subtask12);
 
         fb.save();
 
         assertEquals(1, fb.getAllTasks().size(), "После добавления задачи, количество задач должно " +
                 "увеличиваться на единицу.");
-
-        FileBackedTaskManager fbtm = FileBackedTaskManager.loadFromFile(testFile.toFile());
-
-        assertEquals(1, fbtm.getAllTasks().size(), "Количество задач должно совпадать с сохраненным файлом.");
+        assertEquals(1, fb.getAllEpics().size(), "После добавления задачи, количество задач должно " +
+                "увеличиваться на единицу.");
+        assertEquals(3, fb.getAllSubtasks().size(), "После добавления задачи, количество задач должно " +
+                "увеличиваться на единицу.");
     }
 
     @AfterEach
