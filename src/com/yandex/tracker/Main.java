@@ -5,13 +5,54 @@ import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.model.Task;
 import com.yandex.tracker.service.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class Main {
 
-    public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefault();
+    public static void main(String[] args) throws IOException {
+
+        //Спринт 7. Реализую сохранение информации в файл и загрузка информации из него
+
+        String home = System.getProperty("user.home");
+        Path testFile = Paths.get(home, "file.txt");
+        if (!Files.exists(testFile)) {
+            Files.createFile(testFile);
+        } else {
+            System.out.println("Файл " + testFile.getFileName() + " уже существует.");
+        }
+        TaskManager taskManager = Managers.getDefault(testFile.toFile());
+        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
+        Task task12 = new Task("Сходить в магазин", "купить овощи", TaskStatus.NEW);
+        final int taskID11 = taskManager.addNewTask(task11);
+        final int taskID12 = taskManager.addNewTask(task12);
+
+        Epic epic10 = new Epic("Ремонт", "Обновить цвет стен");
+        Epic epic11 = new Epic("Подготовка отчета", "Организовать сбор информации");
+        final int epicID10 = taskManager.addNewEpic(epic10);
+        final int epicID11 = taskManager.addNewEpic(epic11);
+
+        Subtask subtask10 = new Subtask("Купить краску", "Бежевого цвета", TaskStatus.NEW,
+                epicID10);
+        Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.IN_PROGRESS,
+                epicID10);
+        Subtask subtask12 = new Subtask("Покрасить", "Аккуратно", TaskStatus.NEW,
+                epicID10);
+        taskManager.addNewSubtask(subtask10);
+        taskManager.addNewSubtask(subtask11);
+        taskManager.addNewSubtask(subtask12);
+        taskManager.updateEpicStatus(epicID10);
+
+        System.out.println("Задачи успешно созданы и сохранены!");
+        System.out.println("Файл: " + testFile);
+        System.out.println(taskManager.getAllEpics());
+
+
         //Спринт 6. Реализую пользовательский сценарий
 
-        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
+        /*Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
         Task task12 = new Task("Сходить в магазин", "купить овощи", TaskStatus.NEW);
         final int taskID11 = taskManager.addNewTask(task11);
         final int taskID12 = taskManager.addNewTask(task12);
@@ -44,7 +85,7 @@ public class Main {
         taskManager.removeEpic(epicID10);
         System.out.println(taskManager.getHistory());
 
-        printAllTasks(taskManager);
+        printAllTasks(taskManager);*/
 
 
 /*

@@ -6,55 +6,17 @@ import com.yandex.tracker.model.Task;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File fileBackedTaskManager;
+    private final static String heading = "id,type,name,status,description,epic";
 
     public FileBackedTaskManager(File fileBackedTaskManager) {
         this.fileBackedTaskManager = fileBackedTaskManager;
         loadFile(fileBackedTaskManager);
-    }
-
-    public static void main(String[] args) throws IOException {
-        String home = System.getProperty("user.home");
-        Path testFile = Paths.get(home, "file.txt");
-        if (!Files.exists(testFile)) {
-            Files.createFile(testFile);
-        } else {
-            System.out.println("Файл " + testFile.getFileName() + " уже существует.");
-        }
-        FileBackedTaskManager fileBackedTaskManager = loadFromFile(testFile.toFile());
-        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
-        Task task12 = new Task("Сходить в магазин", "купить овощи", TaskStatus.NEW);
-        final int taskID11 = fileBackedTaskManager.addNewTask(task11);
-        final int taskID12 = fileBackedTaskManager.addNewTask(task12);
-
-        Epic epic10 = new Epic("Ремонт", "Обновить цвет стен");
-        Epic epic11 = new Epic("Подготовка отчета", "Организовать сбор информации");
-        final int epicID10 = fileBackedTaskManager.addNewEpic(epic10);
-        final int epicID11 = fileBackedTaskManager.addNewEpic(epic11);
-
-        Subtask subtask10 = new Subtask("Купить краску", "Бежевого цвета", TaskStatus.NEW,
-                epicID10);
-        Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.NEW,
-                epicID10);
-        Subtask subtask12 = new Subtask("Покрасить", "Аккуратно", TaskStatus.NEW,
-                epicID10);
-        fileBackedTaskManager.addNewSubtask(subtask10);
-        fileBackedTaskManager.addNewSubtask(subtask11);
-        fileBackedTaskManager.addNewSubtask(subtask12);
-
-
-        System.out.println("Задачи успешно созданы и сохранены!");
-        System.out.println("Файл: " + testFile);
-        System.out.println(fileBackedTaskManager.getAllEpics());
-
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
@@ -64,13 +26,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void save() {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(fileBackedTaskManager), StandardCharsets.UTF_8))) {
-            bw.write("id,type,name,status,description,epic");
+            bw.write(heading);
             bw.newLine();
 
             List<Task> allTasks = new ArrayList<>();
-            allTasks.addAll(getAllTasks());
-            allTasks.addAll(getAllSubtasks());
             allTasks.addAll(getAllEpics());
+            allTasks.addAll(getAllSubtasks());
+            allTasks.addAll(getAllTasks());
 
             allTasks.sort(Comparator.comparingInt(Task::getId));
 
@@ -96,22 +58,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
                 Task task = fromString(line.trim());
                 if (task != null) {
-                    if (task instanceof Subtask) {
-                        addNewSubtask((Subtask) task);
-                    } else if (task instanceof Epic) {
-                        addNewEpic((Epic) task);
+                    if (task.getTaskType() == TaskType.SUBTASK) {
+                        addNewSubtaskWithoutSaving((Subtask) task);
+                    } else if (task.getTaskType() == TaskType.EPIC) {
+                        addNewEpicWithoutSaving((Epic) task);
                     } else {
-                        addNewTask(task);
+                        addNewTaskWithoutSaving(task);
                     }
                 }
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка чтения файла " + file.getName());
         }
-    }
-
-    public String toString(Task task) { //сохранение задачи в строку
-        return task.toString();
     }
 
     public Task fromString(String value) { //создание задачи из строки
@@ -151,11 +109,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return id;
     }
 
+    private int addNewTaskWithoutSaving(Task task) {
+        return super.addNewTask(task);
+    }
+
     @Override
     public int addNewEpic(Epic epic) {
         int id = super.addNewEpic(epic);
         save();
         return id;
+    }
+
+    private int addNewEpicWithoutSaving(Epic epic) {
+        return super.addNewEpic(epic);
     }
 
     @Override
@@ -165,24 +131,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return id;
     }
 
-    @Override
-    public ArrayList<Task> getAllTasks() {
-        return super.getAllTasks();
-    }
-
-    @Override
-    public ArrayList<Subtask> getAllSubtasks() {
-        return super.getAllSubtasks();
-    }
-
-    @Override
-    public ArrayList<Epic> getAllEpics() {
-        return super.getAllEpics();
-    }
-
-    @Override
-    public ArrayList<Subtask> getAllSubtasksForEpic(Epic epic) {
-        return super.getAllSubtasksForEpic(epic);
+    private int addNewSubtaskWithoutSaving(Subtask subtask) {
+        return super.addNewSubtask(subtask);
     }
 
     @Override
@@ -243,10 +193,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void removeAllEpics() {
         super.removeAllEpics();
         save();
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return super.getHistory();
     }
 }
