@@ -12,7 +12,7 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File fileBackedTaskManager;
-    private final static String heading = "id,type,name,status,description,epic";
+    private static final String heading = "id,type,name,status,description,epic";
 
     public FileBackedTaskManager(File fileBackedTaskManager) {
         this.fileBackedTaskManager = fileBackedTaskManager;
