@@ -12,7 +12,7 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File fileBackedTaskManager;
-    private static final String heading = "id,type,name,status,description,epic";
+    private static final String HEADING = "id,type,name,status,description,epic";
 
     public FileBackedTaskManager(File fileBackedTaskManager) {
         this.fileBackedTaskManager = fileBackedTaskManager;
@@ -26,7 +26,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void save() {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(fileBackedTaskManager), StandardCharsets.UTF_8))) {
-            bw.write(heading);
+            bw.write(HEADING);
             bw.newLine();
 
             List<Task> allTasks = new ArrayList<>();
