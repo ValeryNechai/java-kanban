@@ -84,7 +84,7 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Task> getAllTasks() {
         ArrayList<Task> allTasks = new ArrayList<>();
         for (Task task : tasks.values()) {
-            allTasks.add(new Task(task.getName(), task.getDescription(), task.getStatus()));
+            allTasks.add(new Task(task.getId(), task.getName(), task.getDescription(), task.getStatus()));
         }
         return allTasks;
     }
@@ -93,7 +93,7 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Subtask> getAllSubtasks() {
         ArrayList<Subtask> allSubtasks = new ArrayList<>();
         for (Subtask subtask : subtasks.values()) {
-            allSubtasks.add(new Subtask(subtask.getName(), subtask.getDescription(), subtask.getStatus(),
+            allSubtasks.add(new Subtask(subtask.getId(), subtask.getName(), subtask.getDescription(), subtask.getStatus(),
                     subtask.getEpicID()));
         }
         return allSubtasks;
@@ -103,7 +103,7 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Epic> getAllEpics() {
         ArrayList<Epic> allEpics = new ArrayList<>();
         for (Epic epic : epics.values()) {
-            allEpics.add(new Epic(epic.getName(), epic.getDescription(), epic.getIdSubtasks()));
+            allEpics.add(new Epic(epic.getId(), epic.getName(), epic.getDescription(), epic.getIdSubtasks(), epic.getStatus()));
         }
         return allEpics;
     }
