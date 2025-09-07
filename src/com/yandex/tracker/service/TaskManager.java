@@ -6,6 +6,7 @@ import com.yandex.tracker.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     int addNewTask(Task task);
@@ -25,6 +26,8 @@ public interface TaskManager {
     ArrayList<Subtask> getAllSubtasks();
 
     ArrayList<Epic> getAllEpics();
+
+    Set<Task> getPrioritizedTasks();
 
     void updateTask(Task task);
 
@@ -47,6 +50,8 @@ public interface TaskManager {
     void removeEpic(Integer id);
 
     void removeAllEpics();
+
+    boolean checkingTaskTimesCross();
 
     List<Task> getHistory();
 }

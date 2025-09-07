@@ -6,13 +6,15 @@ import com.yandex.tracker.model.Task;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File fileBackedTaskManager;
-    private static final String HEADING = "id,type,name,status,description,epic";
+    private static final String HEADING = "id,type,name,status,description,startTime,duration,epic";
 
     public FileBackedTaskManager(File fileBackedTaskManager) {
         this.fileBackedTaskManager = fileBackedTaskManager;
@@ -88,15 +90,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } else {
             status = TaskStatus.IN_PROGRESS;
         }
+        LocalDateTime startTime = (taskFromString[5].trim().equals("null") ? null : LocalDateTime.parse(taskFromString[5].trim(),
+                Task.DATE_TIME_FORMATTER));
+        Duration duration = Duration.ofMinutes(Integer.parseInt(taskFromString[6].trim()));
         if (taskFromString[1].trim().equals("TASK")) {
-            Task task = new Task(id, name, description, status);
+            Task task = new Task(id, name, description, status, startTime, duration);
             return task;
         } else if (taskFromString[1].trim().equals("SUBTASK")) {
-            int epicId = Integer.parseInt(taskFromString[5].trim());
-            Task subtask = new Subtask(id, name, description, status, epicId);
+            int epicId = Integer.parseInt(taskFromString[7].trim());
+            Task subtask = new Subtask(id, name, description, status, startTime, duration, epicId);
             return subtask;
         } else if (taskFromString[1].trim().equals("EPIC")) {
-            Task epic = new Epic(id, name, description, status);
+            Task epic = new Epic(id, name, description, status, startTime, duration);
             return epic;
         }
         return null;
