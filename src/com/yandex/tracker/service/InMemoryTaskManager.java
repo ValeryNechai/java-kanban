@@ -14,8 +14,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private final Map<Integer, Epic> epics = new HashMap<>();
-    TaskComparator taskComparator = new TaskComparator();
-    private final Set<Task>  tasksByPriority = new TreeSet<>(taskComparator);
+    private final Set<Task>  tasksByPriority = new TreeSet<>(Comparator.comparing(Task::getStartTime));
     HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
@@ -74,22 +73,34 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTask(int id) {
         Optional<Task> task = Optional.ofNullable(tasks.get(id));
-        historyManager.add(task.get());
-        return task.get();
+        if (task.isPresent()) {
+            historyManager.add(task.get());
+            return task.get();
+        } else {
+            throw new NullPointerException("Ошибка: передан неинициализированный объект!");
+        }
     }
 
     @Override
     public Epic getEpic(int id) {
         Optional<Epic> epic = Optional.ofNullable(epics.get(id));
-        historyManager.add(epic.get());
-        return epic.get();
+        if (epic.isPresent()) {
+            historyManager.add(epic.get());
+            return epic.get();
+        } else {
+            throw new NullPointerException("Ошибка: передан неинициализированный объект!");
+        }
     }
 
     @Override
     public Subtask getSubtask(int id) {
         Optional<Subtask> subtask = Optional.ofNullable(subtasks.get(id));
-        historyManager.add(subtask.get());
-        return subtask.get();
+        if (subtask.isPresent()) {
+            historyManager.add(subtask.get());
+            return subtask.get();
+        } else {
+            throw new NullPointerException("Ошибка: передан неинициализированный объект!");
+        }
     }
 
     @Override
@@ -120,8 +131,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Set<Task> getPrioritizedTasks() {
-        return tasksByPriority;
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(tasksByPriority);
     }
 
     @Override
@@ -193,16 +204,28 @@ public class InMemoryTaskManager implements TaskManager {
             if (idSubtasks.isEmpty()) {
                 return;
             }
-            Optional<Subtask> startSubtask = idSubtasks.stream().map(subtask -> subtasks.get(subtask))
-                    .min(Comparator.comparing(subtask -> subtask.getStartTime()));
-            LocalDateTime start = startSubtask.get().getStartTime();
-            Optional<Subtask> endSubtask = idSubtasks.stream().map(subtask -> subtasks.get(subtask))
-                    .max(Comparator.comparing(subtask -> subtask.getEndTime()));
-            LocalDateTime end = endSubtask.get().getEndTime();
+            List<Subtask> allSubtasksForEpic = idSubtasks.stream().map(subtask -> subtasks.get(subtask))
+                    .filter(Objects::nonNull).collect(Collectors.toList());
+            if (allSubtasksForEpic.isEmpty()) {
+                epic.setStartTime(null);
+                epic.setEndTime(null);
+                epic.setDuration(Duration.ofMinutes(0));
+                return;
+            }
+            Optional<Subtask> startSubtask = allSubtasksForEpic.stream()
+                    .min(Comparator.comparing(Task::getStartTime));
 
-            epic.setStartTime(start);
-            epic.setEndTime(end);
-            epic.setDuration(Duration.between(start, end));
+            startSubtask.ifPresent(subtask -> epic.setStartTime(subtask.getStartTime()));
+
+            Optional<Subtask> endSubtask = allSubtasksForEpic.stream()
+                    .max(Comparator.comparing(subtask -> subtask.getEndTime()));
+
+            endSubtask.ifPresent(subtask -> epic.setEndTime(subtask.getEndTime()));
+
+            Duration epicDuration = allSubtasksForEpic.stream().map(Subtask::getDuration)
+                            .filter(Objects::nonNull).reduce(Duration.ofMinutes(0), Duration::plus);
+
+            epic.setDuration(epicDuration);
         }
     }
 
@@ -291,7 +314,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean checkingTaskTimesCross() {
-        Set<Task> prioritizedTasks = getPrioritizedTasks();
+        List<Task> prioritizedTasks = getPrioritizedTasks();
         try {
             Optional<Boolean> check = prioritizedTasks.stream().filter(task -> task.getStartTime() != null
                             && task.getEndTime() != null).filter(task -> !(task.getClass() == Epic.class))
@@ -299,7 +322,8 @@ public class InMemoryTaskManager implements TaskManager {
                     .reduce((task1, task2) -> {
                         if (task1.getEndTime().isAfter(task2.getStartTime())
                                 || task1.getStartTime().equals(task2.getStartTime())) {
-                            throw new RuntimeException("Задачи " + task1.getName() + " и " + task2.getName() + " пересекаются!");
+                            throw new ManagerCheckingException("Задачи " + task1.getName() + " и " + task2.getName()
+                                    + " пересекаются!");
                         }
                         return task2;
                     })

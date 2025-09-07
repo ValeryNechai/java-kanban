@@ -27,7 +27,7 @@ public interface TaskManager {
 
     ArrayList<Epic> getAllEpics();
 
-    Set<Task> getPrioritizedTasks();
+    List<Task> getPrioritizedTasks();
 
     void updateTask(Task task);
 

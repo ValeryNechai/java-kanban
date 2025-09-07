@@ -184,7 +184,7 @@ class InMemoryTaskManagerTest {
         taskManager.addNewSubtask(subtask11);
         taskManager.addNewSubtask(subtask12);
 
-        assertEquals(225, epic10.getDuration().toMinutes(),
+        assertEquals(145, epic10.getDuration().toMinutes(),
                 "Промежуток от начала первого сабтаска до окончания последнего не совпадает");
     }
 
