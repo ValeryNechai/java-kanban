@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+import static java.time.Month.AUGUST;
 
 public class Main {
 
@@ -22,8 +26,11 @@ public class Main {
             System.out.println("Файл " + testFile.getFileName() + " уже существует.");
         }
         TaskManager taskManager = Managers.getDefault(testFile.toFile());
-        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
-        Task task12 = new Task("Сходить в магазин", "купить овощи", TaskStatus.NEW);
+
+        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW,
+                Duration.ofMinutes(50));
+        Task task12 = new Task("Сходить в магазин", "купить овощи", TaskStatus.NEW,
+                LocalDateTime.of(2025, AUGUST, 25, 12, 15), Duration.ofMinutes(20));
         final int taskID11 = taskManager.addNewTask(task11);
         final int taskID12 = taskManager.addNewTask(task12);
 
@@ -33,10 +40,12 @@ public class Main {
         final int epicID11 = taskManager.addNewEpic(epic11);
 
         Subtask subtask10 = new Subtask("Купить краску", "Бежевого цвета", TaskStatus.NEW,
-                epicID10);
+                LocalDateTime.of(2025, AUGUST, 26, 15, 15), Duration.ofMinutes(50), epicID10);
         Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.IN_PROGRESS,
+                LocalDateTime.of(2025, AUGUST, 26, 17, 15), Duration.ofMinutes(50),
                 epicID10);
         Subtask subtask12 = new Subtask("Покрасить", "Аккуратно", TaskStatus.NEW,
+                LocalDateTime.of(2025, AUGUST, 26, 18, 15), Duration.ofMinutes(45),
                 epicID10);
         taskManager.addNewSubtask(subtask10);
         taskManager.addNewSubtask(subtask11);
@@ -46,6 +55,10 @@ public class Main {
         System.out.println("Задачи успешно созданы и сохранены!");
         System.out.println("Файл: " + testFile);
         System.out.println(taskManager.getAllEpics());
+        System.out.println(taskManager.getAllSubtasks());
+        System.out.println(taskManager.getAllTasks());
+        System.out.println(taskManager.getAllSubtasksForEpic(epic10));
+        System.out.println(taskManager.getPrioritizedTasks());
     }
 
     private static void printAllTasks(TaskManager manager) {

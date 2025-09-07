@@ -7,6 +7,7 @@ import com.yandex.tracker.service.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +16,7 @@ class TaskTest {
     @Test
     public void shouldGiveSameTaskWithSameId() {
         TaskManager taskManager = new InMemoryTaskManager();
-        Task task1 = new Task("Задача", "Описание задачи", TaskStatus.NEW);
+        Task task1 = new Task("Задача", "Описание задачи", TaskStatus.NEW, Duration.ofMinutes(15));
         int id1 = taskManager.addNewTask(task1);
         int id2 = id1;
 
