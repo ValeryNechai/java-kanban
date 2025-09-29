@@ -76,7 +76,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(task.get());
             return task.get();
         } else {
-            throw new NullPointerException("Ошибка: передан неинициализированный объект!");
+            throw new ManagerGetNullException("Ошибка: передан неинициализированный объект!");
         }
     }
 
@@ -87,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(epic.get());
             return epic.get();
         } else {
-            throw new NullPointerException("Ошибка: передан неинициализированный объект!");
+            throw new ManagerGetNullException("Ошибка: передан неинициализированный объект!");
         }
     }
 
@@ -98,7 +98,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(subtask.get());
             return subtask.get();
         } else {
-            throw new NullPointerException("Ошибка: передан неинициализированный объект!");
+            throw new ManagerGetNullException("Ошибка: передан неинициализированный объект!");
         }
     }
 
