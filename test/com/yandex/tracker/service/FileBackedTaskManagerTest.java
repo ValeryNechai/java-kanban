@@ -10,7 +10,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
+import static java.time.Month.AUGUST;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FileBackedTaskManagerTest {
@@ -39,15 +42,18 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void testSaveAndLoadFile() {
-        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW);
+        Task task11 = new Task("Прогуляться", "сквер возле дома", TaskStatus.NEW, Duration.ofMinutes(15));
         fb.addNewTask(task11);
         Epic epic10 = new Epic("Ремонт", "Обновить цвет стен");
         int epicID10 = fb.addNewEpic(epic10);
         Subtask subtask10 = new Subtask("Купить краску", "Бежевого цвета", TaskStatus.NEW,
+                LocalDateTime.of(2025, AUGUST, 25, 15, 15), Duration.ofMinutes(50),
                 epicID10);
         Subtask subtask11 = new Subtask("Купить кисть", "Большую", TaskStatus.NEW,
+                LocalDateTime.of(2025, AUGUST, 25, 17, 15), Duration.ofMinutes(50),
                 epicID10);
         Subtask subtask12 = new Subtask("Покрасить", "Аккуратно", TaskStatus.NEW,
+                LocalDateTime.of(2025, AUGUST, 25, 19, 15), Duration.ofMinutes(50),
                 epicID10);
         fb.addNewSubtask(subtask10);
         fb.addNewSubtask(subtask11);

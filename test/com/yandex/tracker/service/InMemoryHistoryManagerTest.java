@@ -6,8 +6,11 @@ import com.yandex.tracker.model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.Month.AUGUST;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
@@ -23,7 +26,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldAddTask() {
-        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW);
+        assertEquals(0, history.size(), "До добавления задачи, история должна быть пустой.");
+
+        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW, Duration.ofMinutes(15));
         historyManager.add(task);
         history = historyManager.getHistory();
 
@@ -59,7 +64,8 @@ class InMemoryHistoryManagerTest {
         TaskManager taskManager = new InMemoryTaskManager();
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         int epicId = taskManager.addNewEpic(epic1);
-        Subtask subtask1 = new Subtask("Подзадача", "Описание подзадачи", TaskStatus.NEW, epicId);
+        Subtask subtask1 = new Subtask("Подзадача", "Описание подзадачи", TaskStatus.NEW,
+                LocalDateTime.of(2025, AUGUST, 25, 15, 15), Duration.ofMinutes(50), epicId);
         historyManager.add(subtask1);
         history = historyManager.getHistory();
 
@@ -68,15 +74,25 @@ class InMemoryHistoryManagerTest {
 
         subtask1.setStatus(TaskStatus.IN_PROGRESS);
         historyManager.add(subtask1);
+        history = historyManager.getHistory();
 
         assertEquals(TaskStatus.IN_PROGRESS, historyManager.getHistory().get(0).getStatus(),
                 "После обновления статус задачи должен меняться.");
+
+        assertEquals(1, history.size(), "После повторного добавления задачи, старая задача должна удалиться.");
+
+
     }
 
     @Test
     public void shouldRemove() {
-        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW);
+        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW, Duration.ofMinutes(15));
         historyManager.add(task);
+        historyManager.add(task);
+        history = historyManager.getHistory();
+
+        assertEquals(1, history.size(), "После повторного добавления задачи, старая задача должна удалиться.");
+
         int taskId = task.getId();
         historyManager.remove(taskId);
         assertNotNull(historyManager.getTail(), "После удаления единственной задачи, dummyHead все равно остается.");

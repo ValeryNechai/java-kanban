@@ -26,6 +26,8 @@ public interface TaskManager {
 
     ArrayList<Epic> getAllEpics();
 
+    List<Task> getPrioritizedTasks();
+
     void updateTask(Task task);
 
     void updateSubtask(Subtask subtask);
@@ -47,6 +49,8 @@ public interface TaskManager {
     void removeEpic(Integer id);
 
     void removeAllEpics();
+
+    boolean checkingTaskTimesCross();
 
     List<Task> getHistory();
 }
