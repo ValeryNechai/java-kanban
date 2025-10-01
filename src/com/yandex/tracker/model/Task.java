@@ -12,7 +12,7 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus status;
-    private int id;
+    private Integer id;
     private TaskType taskType;
     private Duration duration;
     private LocalDateTime startTime;
@@ -25,7 +25,7 @@ public class Task {
         this.duration = duration;
     }
 
-    public Task(int id, String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
+    public Task(Integer id, String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -71,7 +71,7 @@ public class Task {
         return startTime.plus(duration);
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

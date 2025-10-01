@@ -13,7 +13,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private final Map<Integer, Epic> epics = new HashMap<>();
-    private final Set<Task>  tasksByPriority = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    private final Set<Task>  tasksByPriority = new TreeSet<>(Comparator.comparing(Task::getStartTime)
+            .thenComparing(Task::getId));
     HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
@@ -53,7 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         subtask.setId(id);
-        if (subtask.getId() == epic.getId()) {
+        if (subtask.getId().equals(epic.getId())) {
             throw new IllegalArgumentException("Нельзя добавить подзадачу в саму себя.");
         }
 
@@ -76,7 +77,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(task.get());
             return task.get();
         } else {
-            throw new ManagerGetNullException("Ошибка: передан неинициализированный объект!");
+            throw new ManagerNotFoundException("Объект с таким id не найден!");
         }
     }
 
@@ -87,7 +88,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(epic.get());
             return epic.get();
         } else {
-            throw new ManagerGetNullException("Ошибка: передан неинициализированный объект!");
+            throw new ManagerNotFoundException("Объект с таким id не найден!");
         }
     }
 
@@ -98,7 +99,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(subtask.get());
             return subtask.get();
         } else {
-            throw new ManagerGetNullException("Ошибка: передан неинициализированный объект!");
+            throw new ManagerNotFoundException("Объект с таким id не найден!");
         }
     }
 
@@ -229,8 +230,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Subtask> getAllSubtasksForEpic(Epic epic) {
-        ArrayList<Subtask> allSubtasksForEpic = epic.getIdSubtasks().stream().map(subtasks::get)
+    public ArrayList<Subtask> getAllSubtasksForEpic(Integer id) {
+        ArrayList<Subtask> allSubtasksForEpic = epics.get(id).getIdSubtasks().stream().map(subtasks::get)
                 .collect(Collectors.toCollection(ArrayList::new));
         return allSubtasksForEpic;
     }
@@ -312,8 +313,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public boolean checkingTaskTimesCross() {
+    public boolean checkingTaskTimesCross(Task t) {
         List<Task> prioritizedTasks = getPrioritizedTasks();
+
+        prioritizedTasks.removeIf(task2 -> task2.getId() == t.getId());
+        prioritizedTasks.add(t);
+
         try {
             Optional<Boolean> check = prioritizedTasks.stream().filter(task -> task.getStartTime() != null
                             && task.getEndTime() != null).filter(task -> !(task.getClass() == Epic.class))

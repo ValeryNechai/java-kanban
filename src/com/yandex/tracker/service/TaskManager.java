@@ -36,7 +36,7 @@ public interface TaskManager {
 
     void updateEpicStatus(Integer id);
 
-    ArrayList<Subtask> getAllSubtasksForEpic(Epic epic);
+    ArrayList<Subtask> getAllSubtasksForEpic(Integer id);
 
     void removeTask(Integer id);
 
@@ -50,7 +50,7 @@ public interface TaskManager {
 
     void removeAllEpics();
 
-    boolean checkingTaskTimesCross();
+    boolean checkingTaskTimesCross(Task task);
 
     List<Task> getHistory();
 }

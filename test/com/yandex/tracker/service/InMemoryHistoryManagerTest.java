@@ -28,7 +28,7 @@ class InMemoryHistoryManagerTest {
     public void shouldAddTask() {
         assertEquals(0, history.size(), "До добавления задачи, история должна быть пустой.");
 
-        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW, Duration.ofMinutes(15));
+        Task task = new Task(1, "Задача", "Описание задачи", TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(15));
         historyManager.add(task);
         history = historyManager.getHistory();
 
@@ -45,7 +45,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldAddEpic() {
-        Task epic1 = new Epic("Эпик", "Описание эпика");
+        Task epic1 = new Epic(1, "Эпик", "Описание эпика", TaskStatus.IN_PROGRESS, LocalDateTime.now(), Duration.ofMinutes(50));
         historyManager.add(epic1);
         history = historyManager.getHistory();
 
@@ -64,7 +64,7 @@ class InMemoryHistoryManagerTest {
         TaskManager taskManager = new InMemoryTaskManager();
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         int epicId = taskManager.addNewEpic(epic1);
-        Subtask subtask1 = new Subtask("Подзадача", "Описание подзадачи", TaskStatus.NEW,
+        Subtask subtask1 = new Subtask(10,"Подзадача", "Описание подзадачи", TaskStatus.NEW,
                 LocalDateTime.of(2025, AUGUST, 25, 15, 15), Duration.ofMinutes(50), epicId);
         historyManager.add(subtask1);
         history = historyManager.getHistory();
@@ -80,13 +80,11 @@ class InMemoryHistoryManagerTest {
                 "После обновления статус задачи должен меняться.");
 
         assertEquals(1, history.size(), "После повторного добавления задачи, старая задача должна удалиться.");
-
-
     }
 
     @Test
     public void shouldRemove() {
-        Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW, Duration.ofMinutes(15));
+        Task task = new Task(1,"Задача", "Описание задачи", TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(15));
         historyManager.add(task);
         historyManager.add(task);
         history = historyManager.getHistory();
