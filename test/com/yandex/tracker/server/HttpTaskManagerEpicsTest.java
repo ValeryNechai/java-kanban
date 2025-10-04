@@ -3,6 +3,7 @@ package com.yandex.tracker.server;
 import com.google.gson.Gson;
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
+import com.yandex.tracker.server.servers.HttpTaskServer;
 import com.yandex.tracker.service.InMemoryTaskManager;
 import com.yandex.tracker.service.TaskManager;
 import com.yandex.tracker.service.TaskStatus;
@@ -30,7 +31,7 @@ public class HttpTaskManagerEpicsTest {
     private HttpClient client;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException, InterruptedException {
         manager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(manager);
         gson = taskServer.getGson();
@@ -39,6 +40,9 @@ public class HttpTaskManagerEpicsTest {
         manager.removeAllTasks();
         manager.removeAllSubtasks();
         manager.removeAllEpics();
+
+        taskServer.start();
+        Thread.sleep(1000);
     }
 
     @AfterEach
@@ -48,9 +52,6 @@ public class HttpTaskManagerEpicsTest {
 
     @Test
     public void testAddEpic() throws IOException, InterruptedException {
-        taskServer.start(8080);
-        Thread.sleep(1000);
-
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         String epicJson = gson.toJson(epic1);
 
@@ -75,13 +76,10 @@ public class HttpTaskManagerEpicsTest {
 
     @Test
     public void testRemoveEpic() throws IOException, InterruptedException {
-        taskServer.start(8081);
-        Thread.sleep(1000);
-
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         int epicId = manager.addNewEpic(epic1);
 
-        URI url = URI.create("http://localhost:8081/epics/" + epicId);
+        URI url = URI.create("http://localhost:8080/epics/" + epicId);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .DELETE()
@@ -98,16 +96,13 @@ public class HttpTaskManagerEpicsTest {
 
     @Test
     public void testGetEpic() throws IOException, InterruptedException {
-        taskServer.start(8082);
-        Thread.sleep(1000);
-
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         int epicId = manager.addNewEpic(epic1);
         Subtask subtask1 = new Subtask("Подзадача", "Описание подзадачи", TaskStatus.NEW,
                 LocalDateTime.of(2025, AUGUST, 25, 15, 15), Duration.ofMinutes(50), epicId);
         manager.addNewSubtask(subtask1);
 
-        URI url = URI.create("http://localhost:8082/epics/" + epicId);
+        URI url = URI.create("http://localhost:8080/epics/" + epicId);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .GET()
@@ -117,7 +112,7 @@ public class HttpTaskManagerEpicsTest {
 
         assertEquals(200, response.statusCode(), "Код ответа должен быть 200");
 
-        URI url2 = URI.create("http://localhost:8082/epics/999");
+        URI url2 = URI.create("http://localhost:8080/epics/999");
         HttpRequest request2 = HttpRequest.newBuilder()
                 .uri(url2)
                 .GET()
@@ -127,7 +122,7 @@ public class HttpTaskManagerEpicsTest {
 
         assertEquals(404, response2.statusCode(), "Такого id не существует -> 404");
 
-        URI url3 = URI.create("http://localhost:8082/epics/" + epicId + "/subtasks");
+        URI url3 = URI.create("http://localhost:8080/epics/" + epicId + "/subtasks");
         HttpRequest request3 = HttpRequest.newBuilder()
                 .uri(url3)
                 .GET()

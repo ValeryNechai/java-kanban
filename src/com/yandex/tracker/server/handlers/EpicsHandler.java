@@ -1,4 +1,4 @@
-package com.yandex.tracker.server;
+package com.yandex.tracker.server.handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
@@ -12,6 +12,7 @@ import com.yandex.tracker.service.TaskManager;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson;
 
-    EpicsHandler(TaskManager taskManager, Gson gson) {
+    public EpicsHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
         this.gson = gson;
     }
@@ -47,64 +48,65 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private void handleGetEpic(HttpExchange exchange) throws IOException {
         Optional<Integer> epicId = getTaskId(exchange);
         String[] partsPath = exchange.getRequestURI().getPath().split("/");
-        if (epicId.isEmpty()) {
-            List<Epic> epics = taskManager.getAllEpics();
-            writeResponse(exchange, gson, epics, 200);
-        } else if (epicId.get() == -1) {
-            Map<String,String> error = Map.of("Error", "Некорректный идентификатор задачи!");
-            writeResponse(exchange, gson, error, 400);
-        } else if (partsPath.length == 4 && partsPath[3].equals("subtasks")) {
-            try {
-                List<Subtask> allSubtasksForEpic = taskManager.getAllSubtasksForEpic(epicId.get());
-                writeResponse(exchange, gson, allSubtasksForEpic, 200);
-            } catch (ManagerNotFoundException exc) {
-                Map<String,String> error = Map.of("Error", exc.getMessage());
-                writeResponse(exchange, gson, error, 404);
+        Map<String,String> error = Map.of();
+        Epic epic = null;
+        List<Epic> epics = new ArrayList<>();
+        List<Subtask> allSubtasksForEpic = new ArrayList<>();
+        try {
+            if (epicId.isEmpty()) {
+                epics = taskManager.getAllEpics();
+            } else if (epicId.get() == -1) {
+                error = Map.of("Error_400", "Некорректный идентификатор задачи!");
+            } else if (partsPath.length == 4 && partsPath[3].equals("subtasks")) {
+                allSubtasksForEpic = taskManager.getAllSubtasksForEpic(epicId.get());
+            } else {
+                epic = taskManager.getEpic(epicId.get());
             }
+        } catch (ManagerNotFoundException exc) {
+            error = Map.of("Error_404", exc.getMessage());
+        }
+
+        if (allSubtasksForEpic.isEmpty()) {
+            sendGetResponse(exchange, gson, error, epic, epics);
         } else {
-            try {
-                Epic epic = taskManager.getEpic(epicId.get());
-                writeResponse(exchange, gson, epic, 200);
-            } catch (ManagerNotFoundException exc) {
-                Map<String,String> error = Map.of("Error", exc.getMessage());
-                writeResponse(exchange, gson, error, 404);
-            }
+            sendGetResponse(exchange, gson, error, epic, allSubtasksForEpic);
         }
     }
 
     private void handlePostEpic(HttpExchange exchange) throws IOException {
         String jsonEpicStr = new String(exchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET);
         Epic epic = gson.fromJson(jsonEpicStr, Epic.class);
+        Map<String,String> error = Map.of();
+        Map<String,String> message = Map.of();
         if (epic.getId() == null) {
             try {
                 taskManager.addNewEpic(epic);
             } catch (ManagerSaveException exc) {
-                writeResponse(exchange, gson, Map.of("Error", exc.getMessage()), 500);
+                error = Map.of("Error_500", exc.getMessage());
             }
-            Map<String,String> message = Map.of("Message", "Эпик успешно добавлен.");
-            writeResponse(exchange, gson, message, 201);
+            message = Map.of("Message", "Эпик успешно добавлен.");
         } else {
-            Map<String,String> error = Map.of("Error", "Эпик с таким id уже существует!");
-            writeResponse(exchange, gson, error, 400);
+            error = Map.of("Error_400", "Эпик с таким id уже существует!");
         }
+        sendPostResponse(exchange, gson, error, message);
     }
 
     private void handleDeleteEpic(HttpExchange exchange) throws IOException {
         Optional<Integer> epicId = getTaskId(exchange);
+        Map<String,String> error = Map.of();
+        Map<String,String> message = Map.of();
         if (epicId.isEmpty()) {
-            Map<String,String> error = Map.of("Error", "Не указан id удаляемого эпика!");
-            writeResponse(exchange, gson, error, 400);
+            error = Map.of("Error_400", "Не указан id удаляемого эпика!");
         } else if (epicId.get() == -1) {
-            Map<String,String> error = Map.of("Error", "Некорректный идентификатор задачи!");
-            writeResponse(exchange, gson, error, 400);
+            error = Map.of("Error_400", "Некорректный идентификатор задачи!");
         } else {
             try {
                 taskManager.removeEpic(epicId.get());
             } catch (ManagerSaveException exc) {
-                writeResponse(exchange, gson, Map.of("Error", exc.getMessage()), 500);
+                error = Map.of("Error_500", exc.getMessage());
             }
-            Map<String,String> message = Map.of("Message", "Эпик успешно удален.");
-            writeResponse(exchange, gson, message, 200);
+            message = Map.of("Message", "Эпик успешно удален.");
         }
+        sendDeleteResponse(exchange, gson, error, message);
     }
 }

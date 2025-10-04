@@ -3,6 +3,7 @@ package com.yandex.tracker.server;
 import com.google.gson.Gson;
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
+import com.yandex.tracker.server.servers.HttpTaskServer;
 import com.yandex.tracker.service.InMemoryTaskManager;
 import com.yandex.tracker.service.TaskManager;
 import com.yandex.tracker.service.TaskStatus;
@@ -30,7 +31,7 @@ public class HttpTaskManagerSubtasksTest {
     private HttpClient client;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws InterruptedException, IOException {
         manager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(manager);
         gson = taskServer.getGson();
@@ -39,6 +40,9 @@ public class HttpTaskManagerSubtasksTest {
         manager.removeAllTasks();
         manager.removeAllSubtasks();
         manager.removeAllEpics();
+
+        taskServer.start();
+        Thread.sleep(1000);
     }
 
     @AfterEach
@@ -48,9 +52,6 @@ public class HttpTaskManagerSubtasksTest {
 
     @Test
     public void testAddSubtask() throws IOException, InterruptedException {
-        taskServer.start(8080);
-        Thread.sleep(1000);
-
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         int epicId = manager.addNewEpic(epic1);
         Subtask subtask1 = new Subtask("Подзадача", "Описание подзадачи", TaskStatus.NEW,
@@ -92,16 +93,13 @@ public class HttpTaskManagerSubtasksTest {
 
     @Test
     public void testRemoveSubtask() throws IOException, InterruptedException {
-        taskServer.start(8081);
-        Thread.sleep(1000);
-
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         int epicId = manager.addNewEpic(epic1);
         Subtask subtask1 = new Subtask("Подзадача", "Описание подзадачи", TaskStatus.NEW,
                 LocalDateTime.of(2025, AUGUST, 25, 15, 15), Duration.ofMinutes(50), epicId);
         manager.addNewSubtask(subtask1);
 
-        URI url = URI.create("http://localhost:8081/subtasks/" + subtask1.getId());
+        URI url = URI.create("http://localhost:8080/subtasks/" + subtask1.getId());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .DELETE()
@@ -118,16 +116,13 @@ public class HttpTaskManagerSubtasksTest {
 
     @Test
     public void testGetSubtask() throws IOException, InterruptedException {
-        taskServer.start(8082);
-        Thread.sleep(1000);
-
         Epic epic1 = new Epic("Эпик", "Описание эпика");
         int epicId = manager.addNewEpic(epic1);
         Subtask subtask1 = new Subtask("Подзадача", "Описание подзадачи", TaskStatus.NEW,
                 LocalDateTime.of(2025, AUGUST, 25, 15, 15), Duration.ofMinutes(50), epicId);
         manager.addNewSubtask(subtask1);
 
-        URI url = URI.create("http://localhost:8082/subtasks/" + subtask1.getId());
+        URI url = URI.create("http://localhost:8080/subtasks/" + subtask1.getId());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .GET()
@@ -137,7 +132,7 @@ public class HttpTaskManagerSubtasksTest {
 
         assertEquals(200, response.statusCode(), "Код ответа должен быть 200");
 
-        URI url2 = URI.create("http://localhost:8082/subtasks/999");
+        URI url2 = URI.create("http://localhost:8080/subtasks/999");
         HttpRequest request2 = HttpRequest.newBuilder()
                 .uri(url2)
                 .GET()

@@ -1,4 +1,4 @@
-package com.yandex.tracker.server;
+package com.yandex.tracker.server.handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
@@ -9,11 +9,11 @@ import com.yandex.tracker.service.TaskManager;
 import java.io.IOException;
 import java.util.List;
 
-public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
+public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson;
 
-    HistoryHandler(TaskManager taskManager, Gson gson) {
+    public PrioritizedHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
         this.gson = gson;
     }
@@ -23,15 +23,15 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         switch (method) {
             case "GET":
-                handleGetHistory(exchange);
+                handleGetPrioritized(exchange);
                 break;
             default:
                 writeResponse(exchange, gson, "Такого эндпоинта не существует.", 404);
         }
     }
 
-    private void handleGetHistory(HttpExchange exchange) throws IOException {
-        List<Task> tasksHistory = taskManager.getHistory();
-        writeResponse(exchange, gson, tasksHistory, 200);
+    private void handleGetPrioritized(HttpExchange exchange) throws IOException {
+        List<Task> tasksPrioritized = taskManager.getPrioritizedTasks();
+        writeResponse(exchange, gson, tasksPrioritized, 200);
     }
 }

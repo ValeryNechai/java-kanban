@@ -1,4 +1,4 @@
-package com.yandex.tracker.server;
+package com.yandex.tracker.server.adapters;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

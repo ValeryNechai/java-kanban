@@ -1,5 +1,6 @@
 package com.yandex.tracker.server;
 
+import com.yandex.tracker.server.servers.HttpTaskServer;
 import com.yandex.tracker.service.InMemoryTaskManager;
 import com.yandex.tracker.service.TaskManager;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class HttpTaskManagerPrioritizedTest {
     private HttpClient client;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException, InterruptedException {
         manager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(manager);
         client = HttpClient.newHttpClient();
@@ -28,6 +29,9 @@ public class HttpTaskManagerPrioritizedTest {
         manager.removeAllTasks();
         manager.removeAllSubtasks();
         manager.removeAllEpics();
+
+        taskServer.start();
+        Thread.sleep(1000);
     }
 
     @AfterEach
@@ -37,10 +41,7 @@ public class HttpTaskManagerPrioritizedTest {
 
     @Test
     public void testGetPrioritized() throws IOException, InterruptedException {
-        taskServer.start(8082);
-        Thread.sleep(1000);
-
-        URI url = URI.create("http://localhost:8082/prioritized");
+        URI url = URI.create("http://localhost:8080/prioritized");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .GET()

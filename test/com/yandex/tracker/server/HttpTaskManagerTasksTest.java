@@ -2,6 +2,7 @@ package com.yandex.tracker.server;
 
 import com.google.gson.Gson;
 import com.yandex.tracker.model.Task;
+import com.yandex.tracker.server.servers.HttpTaskServer;
 import com.yandex.tracker.service.InMemoryTaskManager;
 import com.yandex.tracker.service.TaskManager;
 import com.yandex.tracker.service.TaskStatus;
@@ -28,7 +29,7 @@ public class HttpTaskManagerTasksTest {
     private HttpClient client;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException, InterruptedException {
         manager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(manager);
         gson = taskServer.getGson();
@@ -37,6 +38,9 @@ public class HttpTaskManagerTasksTest {
         manager.removeAllTasks();
         manager.removeAllSubtasks();
         manager.removeAllEpics();
+
+        taskServer.start();
+        Thread.sleep(1000);
     }
 
     @AfterEach
@@ -47,9 +51,6 @@ public class HttpTaskManagerTasksTest {
 
     @Test
     public void testAddTask() throws IOException, InterruptedException {
-        taskServer.start(8080);
-        Thread.sleep(1000);
-
         Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(5));
         Task task2 = new Task("Задача2", "Описание задачи", TaskStatus.NEW, LocalDateTime.now().plusMinutes(2), Duration.ofMinutes(5));
         String taskJson = gson.toJson(task);
@@ -87,13 +88,10 @@ public class HttpTaskManagerTasksTest {
 
     @Test
     public void testRemoveTask() throws IOException, InterruptedException {
-        taskServer.start(8081);
-        Thread.sleep(1000);
-
         Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(5));
         manager.addNewTask(task);
 
-        URI url = URI.create("http://localhost:8081/tasks/" + task.getId());
+        URI url = URI.create("http://localhost:8080/tasks/" + task.getId());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .DELETE()
@@ -110,13 +108,10 @@ public class HttpTaskManagerTasksTest {
 
     @Test
     public void testGetTask() throws IOException, InterruptedException {
-        taskServer.start(8082);
-        Thread.sleep(1000);
-
         Task task = new Task("Задача", "Описание задачи", TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(5));
         manager.addNewTask(task);
 
-        URI url = URI.create("http://localhost:8082/tasks/" + task.getId());
+        URI url = URI.create("http://localhost:8080/tasks/" + task.getId());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .GET()
@@ -126,7 +121,7 @@ public class HttpTaskManagerTasksTest {
 
         assertEquals(200, response.statusCode(), "Код ответа должен быть 200");
 
-        URI url2 = URI.create("http://localhost:8082/tasks/5");
+        URI url2 = URI.create("http://localhost:8080/tasks/5");
         HttpRequest request2 = HttpRequest.newBuilder()
                 .uri(url2)
                 .GET()

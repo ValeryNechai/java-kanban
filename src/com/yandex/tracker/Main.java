@@ -1,6 +1,6 @@
 package com.yandex.tracker;
 
-import com.yandex.tracker.server.HttpTaskServer;
+import com.yandex.tracker.server.servers.HttpTaskServer;
 import com.yandex.tracker.service.*;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class Main {
         TaskManager taskManager = Managers.getDefault(testFile.toFile());
         HttpTaskServer taskServer = new HttpTaskServer(taskManager);
 
-        taskServer.start(8080);
+        taskServer.start();
     }
 }
 
