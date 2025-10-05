@@ -24,20 +24,21 @@ public abstract class BaseHttpHandler {
         }
     }
 
-    protected void sendGetResponse(HttpExchange exchange, Gson gson, Map<String,String> error, Object o1, Object o2) throws IOException {
+    protected void sendGetResponse(HttpExchange exchange, Gson gson, Map<String, String> error, Object task,
+                                   Object tasks) throws IOException {
         if (!error.isEmpty() && error.containsKey("Error_400")) {
             writeResponse(exchange, gson, error, 400);
         } else if (!error.isEmpty() && error.containsKey("Error_404")) {
             writeResponse(exchange, gson, error, 404);
-        } else if (o1 != null) {
-            writeResponse(exchange, gson, o1, 200);
+        } else if (task != null) {
+            writeResponse(exchange, gson, task, 200);
         } else {
-            writeResponse(exchange, gson, o2, 200);
+            writeResponse(exchange, gson, tasks, 200);
         }
     }
 
-    protected void sendPostResponse(HttpExchange exchange, Gson gson, Map<String,String> error, Map<String,String> message)
-            throws IOException {
+    protected void sendPostResponse(HttpExchange exchange, Gson gson, Map<String, String> error,
+                                    Map<String,String> message) throws IOException {
         if (!error.isEmpty() && error.containsKey("Error_406")) {
             writeResponse(exchange, gson, error, 406);
         } else if (!error.isEmpty() && error.containsKey("Error_500")) {
@@ -49,8 +50,8 @@ public abstract class BaseHttpHandler {
         }
     }
 
-    protected void sendDeleteResponse(HttpExchange exchange, Gson gson, Map<String,String> error, Map<String,String> message)
-            throws IOException {
+    protected void sendDeleteResponse(HttpExchange exchange, Gson gson, Map<String, String> error,
+                                      Map<String, String> message) throws IOException {
         if (!error.isEmpty() && error.containsKey("Error_500")) {
             writeResponse(exchange, gson, error, 500);
         } else if (!error.isEmpty() && error.containsKey("Error_400")) {
