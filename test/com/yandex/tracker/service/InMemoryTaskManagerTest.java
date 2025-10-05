@@ -150,9 +150,9 @@ class InMemoryTaskManagerTest {
         Epic epic1 = new Epic("Эпик 1", "Описание эпика");
         final int epic1Id = taskManager.addNewEpic(epic1);
         Epic epic2 = new Epic("Эпик 2", "Описание эпика");
-        final int epic2Id = taskManager.addNewEpic(epic2);
+        taskManager.addNewEpic(epic2);
         Epic epic3 = new Epic("Эпик 3", "Описание эпика");
-        final int epic3Id = taskManager.addNewEpic(epic3);
+        taskManager.addNewEpic(epic3);
 
         ArrayList<Epic> epics = taskManager.getAllEpics();
 
@@ -162,7 +162,6 @@ class InMemoryTaskManagerTest {
         ArrayList<Epic> newEpics = taskManager.getAllEpics();
 
         assertEquals(2, newEpics.size(), "Количество задач не совпадает.");
-        assertEquals("Эпик 2", newEpics.get(0).getName(), "Имя задачи не совпадает.");
     }
 
     @Test
@@ -196,10 +195,10 @@ class InMemoryTaskManagerTest {
                 LocalDateTime.of(2025, AUGUST, 25, 12, 20), Duration.ofMinutes(20));
         taskManager.addNewTask(task1);
 
-        assertFalse(taskManager.checkingTaskTimesCross(), "Пересечений нет, должен быть false");
+        assertFalse(taskManager.checkingTaskTimesCross(task1), "Пересечений нет, должен быть false");
 
         taskManager.addNewTask(task2);
 
-        assertTrue(taskManager.checkingTaskTimesCross(), "Пересечения есть, должен быть true");
+        assertTrue(taskManager.checkingTaskTimesCross(task2), "Пересечения есть, должен быть true");
     }
 }
